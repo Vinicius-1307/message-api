@@ -22,7 +22,8 @@ class User extends Authenticatable implements JWTSubject
     protected $visible = [
         'name',
         'email',
-        'is_admin'
+        'is_admin',
+        'id'
     ];
 
     // Rest omitted for brevity

@@ -1,7 +1,11 @@
 <?php
 
+use App\Builder\ReturnApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Messages\MessagesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,22 +18,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => 'jwt.auth'], function () {
-});
-Route::prefix('user')->group(function () {
-    Route::post('/', [\App\Http\Controllers\UserController::class, 'create']);
-    Route::post('/login', [\App\Http\Controllers\UserController::class, 'login']);
-});
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-Route::middleware('auth:api')->get('/token', function (Request $request) {
-    return $request->user();
-});
-//User routes
+// AUTHENTICATION
+Route::middleware('authJwt')->group(function () {
+    Route::middleware('admin')->group(function () {
 
-//Messages routes
-Route::prefix('messages')->group(function () {
-    Route::post('/', [\App\Http\Controllers\Messages\MessagesController::class, 'send']);
-    Route::get('/', [\App\Http\Controllers\Messages\MessagesController::class, 'list']);
-    Route::patch('/{id}', [\App\Http\Controllers\Messages\MessagesController::class, 'read']);
-    Route::delete('/{id}', [\App\Http\Controllers\Messages\MessagesController::class, 'delete']);
+        //User routes
+        Route::prefix('user')->group(function () {
+            Route::post('/', [UserController::class, 'create']);
+        });
+
+        //Messages routes
+        Route::prefix('messages')->group(function () {
+            Route::post('/', [MessagesController::class, 'create']);
+            Route::get('/', [MessagesController::class, 'list']);
+            Route::patch('/{id}', [MessagesController::class, 'read']);
+            Route::delete('/{id}', [MessagesController::class, 'delete']);
+        });
+    });
 });

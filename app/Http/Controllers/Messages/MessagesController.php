@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Messages;
 
 use App\Builder\ReturnApi;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\MessageRequest;
 use App\Models\Message;
 use App\Models\UserHasMessage;
 use Exception;
@@ -12,27 +14,13 @@ use Illuminate\Support\Facades\Validator;
 
 class MessagesController extends Controller
 {
-
-    public static function create(array $data)
+    public function create(MessageRequest $request)
     {
         try {
             $loggedUser = (Auth::user());
-            if (!$loggedUser->is_admin) return response()->json(['Message' => 'Você não tem permissão para criar um usuário.'], 401);
+            if (!$loggedUser->is_admin) return ReturnApi::Error("Você não tem permissão para criar uma mensagem.", null, null, 401);
 
-            //Validation
-            $rules = [
-                'title' => 'required|min:5',
-                'content' => 'required'
-            ];
-
-            $messages = [
-                'title.required' => 'Informe o título da mensagem',
-                'title.min' => 'O título da mensagem deve conter no mínimo 5 caracteres',
-                'content.required' => 'Informe o conteúdo da mensagem',
-            ];
-
-            $validate = Validator::make($data, $rules, $messages);
-            if ($validate->fails()) throw new Exception($validate->errors()->first(), 409);
+            $data = $request->validated();
 
             //Create message
             $message = Message::create(
@@ -54,43 +42,29 @@ class MessagesController extends Controller
      * @param Request $request Payload data
      * @return JsonResponse
      */
-    public static function send(Request $request)
-    {
-        try {
-            $data = $request->all();
+    // public static function send(Request $request)
+    // {
+    //     try {
+    //         $data = $request->all();
 
-            $rules = [
-                'title' => 'required',
-                'content' => 'required',
-                'icon' => 'required',
-                'users' => 'required|array',
-            ];
+    //         $validate = Validator();
+    //         if ($validate->fails()) return ReturnApi::Error($validate->errors()->first(), null, null, 409);
 
-            $messages = [
-                'title.required' => 'Informe o título da mensagem',
-                'content.required' => 'Informe o conteúdo da mensagem',
-                'users.required' => 'Informe os usuários que receberão a mensagem',
-                'users.array' => 'Informe os usuários que receberão a mensagem em formato de array',
-            ];
+    //         $users = $data['users'];
 
-            $validate = Validator::make($data, $rules, $messages);
-            if ($validate->fails()) return ReturnApi::Error($validate->errors()->first(), null, null, 409);
+    //         $message = self::create($data);
+    //         if ($message['error']) return ReturnApi::Error($message['message'], null, null, 409);
 
-            $users = $data['users'];
-
-            $message = self::create($data);
-            if ($message['error']) return ReturnApi::Error($message['message'], null, null, 409);
-
-            foreach ($users as $user) {
-                UserHasMessage::create([
-                    'user' => $user,
-                    'message' => $message['data']->id
-                ]);
-            }
-        } catch (Exception $err) {
-            return ReturnApi::Error($err->getMessage(), 500);
-        }
-    }
+    //         foreach ($users as $user) {
+    //             UserHasMessage::create([
+    //                 'user' => $user,
+    //                 'message' => $message['data']->id
+    //             ]);
+    //         }
+    //     } catch (Exception $err) {
+    //         return ReturnApi::Error($err->getMessage(), 500);
+    //     }
+    // }
 
     /**
      * Mark message as readed
