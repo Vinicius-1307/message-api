@@ -17,9 +17,6 @@ class MessagesController extends Controller
     public function create(MessageRequest $request)
     {
         try {
-            $loggedUser = (Auth::user());
-            if (!$loggedUser->is_admin) return ReturnApi::Error("Você não tem permissão para criar uma mensagem.", null, null, 401);
-
             $data = $request->validated();
 
             //Create message
@@ -30,6 +27,16 @@ class MessagesController extends Controller
                     'created_at' => now()
                 ]
             );
+
+            $users = $data['users'];
+
+            foreach ($users as $user) {
+                UserHasMessage::create([
+                    'user_id' => $user->id,
+                    'message_id' => $message->id,
+                    "is_read" => false
+                ]);
+            }
 
             return ['error' => false, 'data' => $message];
         } catch (Exception $err) {

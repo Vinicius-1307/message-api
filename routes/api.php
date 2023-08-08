@@ -27,6 +27,9 @@ Route::middleware('authJwt')->group(function () {
         //User routes
         Route::prefix('user')->group(function () {
             Route::post('/', [UserController::class, 'create']);
+            Route::get('/all', [UserController::class, 'list']);
+            Route::put('update/{id}', [UserController::class, 'update']);
+            Route::delete('destroy/{id}', [UserController::class, 'destroy']);
         });
 
         //Messages routes
