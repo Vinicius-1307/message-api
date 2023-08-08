@@ -67,27 +67,41 @@ class UserController extends Controller
         }
     }
 
-    public function list(Request $request)
+    public function list()
     {
         $users = User::all();
-
-        if (!isset($users)) {
-            return ReturnApi::Error("Não há nenhum usuário cadastrado", null);
-        }
         return (['error' => false, 'users' => $users]);
     }
 
     public function destroy($id)
     {
-        try {
-            $user = User::find($id);
-            if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        $user = User::find($id);
+        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
-            $user->delete();
+        $user->destroy();
 
-            return ReturnApi::Success("Usuário deletado com sucesso.", $user);
-        } catch (Exception $th) {
-            return ReturnApi::Error($th->getMessage(), 500);
-        }
+        return ReturnApi::Success("Usuário deletado com sucesso.", $user);
+    }
+
+    public function disable($id)
+    {
+        $user = User::find($id);
+        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+
+        $user->delete();
+
+        return ReturnApi::Success("Usuário desabilitado com sucesso.", $user);
+    }
+
+    public function restore($id)
+    {
+        $user = User::find($id);
+        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+
+        $user->deleted_at === null;
+
+        $user->save();
+
+        return ReturnApi::Success("Usuário restaurado com sucesso.", $user);
     }
 }

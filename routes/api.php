@@ -26,10 +26,12 @@ Route::middleware('authJwt')->group(function () {
 
         //User routes
         Route::prefix('user')->group(function () {
-            Route::post('/', [UserController::class, 'create']);
             Route::get('/all', [UserController::class, 'list']);
+            Route::post('/', [UserController::class, 'create']);
             Route::put('update/{id}', [UserController::class, 'update']);
+            Route::patch('/restore/{id}', [UserController::class, 'restore']);
             Route::delete('destroy/{id}', [UserController::class, 'destroy']);
+            Route::delete('/disable/{id}', [UserController::class, 'disable']);
         });
 
         //Messages routes
