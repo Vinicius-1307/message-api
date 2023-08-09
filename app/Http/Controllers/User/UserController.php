@@ -47,7 +47,7 @@ class UserController extends Controller
             ];
 
             $messages = [
-                'name.required' => 'Nome do banco deve ser informado',
+                'name.required' => 'Nome do usuário deve ser informado',
                 'email.required' => 'Novo e-mail deve ser informado',
                 'password.required' => 'Nova senha deve ser informado'
             ];
@@ -69,30 +69,20 @@ class UserController extends Controller
 
     public function list()
     {
-        $users = User::all();
+        $users = User::withTrashed()->get();
         return (['error' => false, 'users' => $users]);
     }
 
     public function find($id)
     {
-        $user = User::find($id);
+        $user = User::withTrashed()->find($id);
         return (['error' => false, 'users' => $user]);
-    }
-
-    public function destroy($id)
-    {
-        $user = User::where(['id', $id])->withTrashed()->first();
-        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
-
-        $user->destroy();
-
-        return ReturnApi::Success("Usuário deletado com sucesso.", $user);
     }
 
     public function disable($id)
     {
         $user = User::find($id);
-        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        if (!isset($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
         $user->delete();
 
@@ -101,11 +91,22 @@ class UserController extends Controller
 
     public function restore($id)
     {
-        $user = User::where(['id', $id])->withTrashed()->first();
-        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        $user = User::where('id', $id)->withTrashed()->first();
+        // dd($user);
+        if (!isset($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
         $user->restore();
 
         return ReturnApi::Success("Usuário restaurado com sucesso.", $user);
+    }
+
+    public function destroy($id)
+    {
+        $user = User::where(['id', $id])->withTrashed()->first();
+        if (!isset($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+
+        $user->destroy();
+
+        return ReturnApi::Success("Usuário deletado com sucesso.", $user);
     }
 }
