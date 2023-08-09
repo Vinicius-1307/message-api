@@ -73,10 +73,16 @@ class UserController extends Controller
         return (['error' => false, 'users' => $users]);
     }
 
-    public function destroy($id)
+    public function find($id)
     {
         $user = User::find($id);
-        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        return (['error' => false, 'users' => $user]);
+    }
+
+    public function destroy($id)
+    {
+        $user = User::where(['id', $id])->withTrashed()->first();
+        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
         $user->destroy();
 
@@ -86,7 +92,7 @@ class UserController extends Controller
     public function disable($id)
     {
         $user = User::find($id);
-        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
         $user->delete();
 
@@ -95,12 +101,10 @@ class UserController extends Controller
 
     public function restore($id)
     {
-        $user = User::find($id);
-        if (!$user) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
+        $user = User::where(['id', $id])->withTrashed()->first();
+        if (empty($user)) return ReturnApi::Error("Usuário não encontrado.", null, null, 404);
 
-        $user->deleted_at === null;
-
-        $user->save();
+        $user->restore();
 
         return ReturnApi::Success("Usuário restaurado com sucesso.", $user);
     }
