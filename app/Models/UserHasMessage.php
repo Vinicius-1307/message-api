@@ -14,8 +14,8 @@ class UserHasMessage extends Model
     protected $table = 'user_has_message';
 
     protected $fillable = [
-        'user',
-        'message',
+        'user_id',
+        'message_id',
         'readed',
         'readed_at'
     ];

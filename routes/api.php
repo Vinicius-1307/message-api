@@ -37,7 +37,7 @@ Route::middleware('authJwt')->group(function () {
 
         //Messages routes
         Route::prefix('messages')->group(function () {
-            Route::post('/', [MessagesController::class, 'create']);
+            Route::post('/', [MessagesController::class, 'send']);
             Route::get('/', [MessagesController::class, 'list']);
             Route::patch('/{id}', [MessagesController::class, 'read']);
             Route::delete('/{id}', [MessagesController::class, 'delete']);
