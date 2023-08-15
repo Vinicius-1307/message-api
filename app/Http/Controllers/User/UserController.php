@@ -22,7 +22,8 @@ class UserController extends Controller
             User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => bcrypt($data['password'])
+                'password' => bcrypt($data['password']),
+                'is_admin' => $data['is_admin']
             ]);
             return ReturnApi::Success('Usuário criado com sucesso.', 201);
         } catch (\Throwable $th) {
