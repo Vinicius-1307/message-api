@@ -155,7 +155,7 @@ class MessagesController extends Controller
         try {
             $user = Auth::id();
 
-            $filters = ['user' => $user];
+            $filters = ['user_id' => $user];
 
             $readed = $request->query('readed', null);
 
