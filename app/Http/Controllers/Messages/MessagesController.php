@@ -169,14 +169,13 @@ class MessagesController extends Controller
 
             $messages = UserHasMessage::select(
                 'user_has_message.readed',
-                'user_has_message.readed_at',
                 'messages.id',
                 'messages.title',
                 'messages.content',
                 'messages.created_at'
             )
                 ->where($filters)
-                ->join('messages', 'messages.id', '=', 'user_has_message.message')
+                ->join('messages', 'messages.id', '=', 'user_has_message.message_id')
                 ->orderByRaw("user_has_message.readed ASC, messages.created_at DESC")
                 ->paginate($per_page)->toArray();
 
