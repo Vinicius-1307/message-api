@@ -22,7 +22,8 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 // AUTHENTICATION
 Route::middleware('authJwt')->group(function () {
-    Route::get('/', [MessagesController::class, 'list']);
+
+    Route::get('list-messages/', [MessagesController::class, 'list']);
 
     Route::middleware('admin')->group(function () {
 

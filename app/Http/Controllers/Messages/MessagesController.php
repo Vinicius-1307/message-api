@@ -129,8 +129,8 @@ class MessagesController extends Controller
             $user = Auth::id();
 
             $userHasMessage = UserHasMessage::where([
-                'user' => $user,
-                'message' => $id,
+                'user_id' => $user,
+                'message_id' => $id,
             ])->first();
             if (!$userHasMessage) return ReturnApi::Error('Usuário não possui a mensagem informada', null, null, 404);
             if ($userHasMessage->readed) return ReturnApi::Error('Mensagem já lida pelo usuário', null, null, 409);
