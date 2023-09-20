@@ -133,7 +133,7 @@ class MessagesController extends Controller
                 'message_id' => $id,
             ])->first();
             if (!$userHasMessage) return ReturnApi::Error('Usuário não possui a mensagem informada', null, null, 404);
-            if ($userHasMessage->readed) return ReturnApi::Error('Mensagem já lida pelo usuário', null, null, 409);
+            if ($userHasMessage->readed) return ReturnApi::Error('Mensagem já lida pelo usuário', null, null, 400);
 
             $userHasMessage->readed = true;
             $userHasMessage->readed_at = date('Y-m-d H:i:s');

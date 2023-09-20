@@ -24,6 +24,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::middleware('authJwt')->group(function () {
 
     Route::get('list-messages/', [MessagesController::class, 'list']);
+    Route::patch('read/{id}', [MessagesController::class, 'read']);
 
     Route::middleware('admin')->group(function () {
 
@@ -41,7 +42,6 @@ Route::middleware('authJwt')->group(function () {
         //Messages routes
         Route::prefix('messages')->group(function () {
             Route::post('/', [MessagesController::class, 'send']);
-            Route::patch('/{id}', [MessagesController::class, 'read']);
             Route::delete('/{id}', [MessagesController::class, 'delete']);
         });
     });
