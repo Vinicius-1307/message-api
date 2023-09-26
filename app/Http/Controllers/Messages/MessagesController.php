@@ -155,13 +155,10 @@ class MessagesController extends Controller
         try {
             $user = Auth::id();
 
-            $filters = ['user_id' => $user];
-
-            $readed = $request->query('readed', null);
-
-            if (isset($readed) && $readed != '' && ($readed == "1" || $readed == "0")) {
-                $filters['user_has_message.readed'] = $readed;
-            }
+            $filters = [
+                'user_id' => $user,
+                'readed' => false
+            ];
 
             // Paginação
             $per_page = $request->query('per_page', 10);
