@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Messages;
 
 use App\Builder\ReturnApi;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MessageRequest;
-use App\Http\Requests\SendMessageRequest;
+use App\Http\Requests\Messages\CreateMessageRequest;
+use App\Http\Requests\Messages\SendMessageRequest;
 use App\Models\Message;
 use App\Models\UserHasMessage;
 use Exception;
@@ -15,104 +15,24 @@ use Illuminate\Support\Facades\Validator;
 
 class MessagesController extends Controller
 {
-    public function create(array $data)
+    public function create(CreateMessageRequest $request)
     {
-        try {
-
-            $rules = [
-                'title' => 'required',
-                'content' => 'required',
-            ];
-
-            $messages = [
-                'title.required' => 'Informe o título da mensagem',
-                'content.required' => 'Informe o conteúdo da mensagem',
-            ];
-
-            $validate = Validator::make($data, $rules, $messages);
-            if ($validate->fails()) throw new Exception($validate->errors()->first(), 409);
-
-            $message = Message::create(
-                [
-                    'title' => $data['title'],
-                    'content' => $data['content'],
-                    'created_at' => now()
-                ]
-            );
-            return ['error' => false, 'data' => $message];
-        } catch (Exception $err) {
-            return ['error' => true, 'message' => $err->getMessage()];
-        }
+        return returnApi::Success('Mensagem criada com sucesso.', Message::create($request->validated()), 200);
     }
 
-    public static function send(Request $request)
-    {
-        try {
-            $data = $request->all();
-
-            $rules = [
-                'title' => 'required',
-                'content' => 'required',
-                'users' => 'required|array',
-            ];
-
-            $messages = [
-                'title.required' => 'Informe o título da mensagem',
-                'content.required' => 'Informe o conteúdo da mensagem',
-                'users.required' => 'Informe os usuários que receberão a mensagem',
-                'users.array' => 'Informe os usuários que receberão a mensagem em formato de array',
-            ];
-
-            $validate = Validator::make($data, $rules, $messages);
-            if ($validate->fails()) throw new Exception($validate->errors()->first(), 409);
-
-            $users = $data['users'];
-
-            $message = self::create($data);
-            if ($message['error']) return ReturnApi::Error($message['message'], null, null, 409);
-
-            // dd($users);
-
-            foreach ($users as $user) {
-                UserHasMessage::create([
-                    'user_id' => $user,
-                    'message_id' => $message['data']->id
-                ]);
-            }
-
-            return ReturnApi::Success('Mensagem enviada com sucesso!', $message['data']);
-        } catch (Exception $err) {
-            return ReturnApi::Error($err->getMessage(), 500);
-        }
-    }
-
-    /**
-     * Create message and associate with user
-     * @param Request $request Payload data
-     * @return JsonResponse
-     */
-    // public static function send(Request $request)
+    // public static function send(SendMessageRequest $request)
     // {
-    //     try {
-    //         $data = $request->all();
+    //     $users = $request['users'];
+    //     dd($request);
+    //     $message = self::create($request);
 
-    //         $validate = Validator();
-    //         if ($validate->fails()) return ReturnApi::Error($validate->errors()->first(), null, null, 409);
-
-    //         $users = $data['users'];
-
-    //         $message = self::create($data);
-    //         if ($message['error']) return ReturnApi::Error($message['message'], null, null, 409);
-
-    //         foreach ($users as $user) {
-    //             UserHasMessage::create([
-    //                 'user' => $user,
-    //                 'message' => $message['data']->id
-    //             ]);
-    //         }
-    //     } catch (Exception $err) {
-    //         return ReturnApi::Error($err->getMessage(), 500);
+    //     foreach ($users as $user) {
+    //         UserHasMessage::create([
+    //             'user_id' => $user,
+    //             'message_id' => $message['data']->id
+    //         ]);
     //     }
+    //     return ReturnApi::Success('Mensagem enviada com sucesso!', $message['data']);
     // }
 
     /**
